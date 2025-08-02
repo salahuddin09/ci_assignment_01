@@ -1,0 +1,23 @@
+name: Dependent Workflow
+
+on:
+  workflow_run:
+    workflows: ["List Changed Files"]
+    types:
+      - completed
+
+jobs:
+  process-changes:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Changed Files Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: changed-files
+          path: .
+
+      - name: Display Changed Files
+        run: |
+          echo "Changed files from previous workflow:"
+          cat changed_files.txt
